@@ -1106,3 +1106,511 @@ Fichiers modifiés :
 **Durée de la session** : ~90 minutes
 **Difficulté** : ⭐⭐⭐ Difficile (concepts avancés : DI, Repository Pattern)
 **Status** : ✅ Session 4 terminée avec succès
+
+---
+
+## 📅 Session 5 - 22 Novembre 2025 : Affichage Dynamique des Transactions + Formulaire d'Ajout
+
+### 🎯 Objectif de la session
+Connecter l'interface XAML aux données réelles de la base de données, et créer un formulaire fonctionnel pour ajouter des transactions en temps réel.
+
+---
+
+### ✅ Étape 1 : Afficher les Transactions Réelles (ItemsControl Binding)
+
+**Ce qu'on a fait** :
+Remplacement de la liste mockée de transactions par un `ItemsControl` lié au ViewModel :
+
+```xml
+<ItemsControl ItemsSource="{Binding Transactions}">
+    <ItemsControl.ItemTemplate>
+        <DataTemplate>
+            <Border Background="#ECF0F1" Padding="15" CornerRadius="5" Margin="0,0,0,10">
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                    <!-- Date -->
+                    <TextBlock Grid.Column="0"
+                              Text="{Binding Date, StringFormat='dd/MM/yyyy'}"
+                              FontSize="14"/>
+
+                    <!-- Description et Compte -->
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="{Binding Description}" FontSize="16"/>
+                        <TextBlock Text="{Binding Account.Name}" FontSize="12"/>
+                    </StackPanel>
+
+                    <!-- Statut Lissable -->
+                    <TextBlock Grid.Column="2" Text="{Binding IsDeferrable}"/>
+
+                    <!-- Montant -->
+                    <TextBlock Grid.Column="3"
+                              Text="{Binding Amount, StringFormat='N2'} €"
+                              FontSize="16"
+                              FontWeight="SemiBold"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </ItemsControl.ItemTemplate>
+</ItemsControl>
+```
+
+**Pourquoi** :
+- `ItemsControl` crée automatiquement un élément de l'UI pour chaque objet dans la collection
+- La `DataTemplate` définit comment afficher chaque transaction
+- Le binding `{Binding Transactions}` lie la collection du ViewModel à l'UI
+
+**Résultat** :
+- ✅ Les transactions de la base de données s'affichent dynamiquement
+- ✅ Chaque transaction montre : Date, Description, Compte, Montant
+
+**Problème rencontré** :
+- Transactions en doublons (Restaurant et Carburant apparaissaient 2-3 fois)
+- **Cause** : `AddTestTransactions.AddTwoTestTransactionsAsync()` était appelé à chaque démarrage
+
+**Solution** :
+Ajout d'une vérification `.Any()` pour éviter les doublons :
+```csharp
+var restaurantExists = context.Transactions
+    .Any(t => t.Description == "Restaurant avec copains" && t.Amount == -45.50m);
+var carburantExists = context.Transactions
+    .Any(t => t.Description == "Carburant Shell" && t.Amount == -62.30m);
+
+if (restaurantExists && carburantExists)
+    return; // Les transactions existent déjà
+```
+
+---
+
+### ✅ Étape 2 : Créer TransactionsViewModel
+
+**Ce qu'on a fait** :
+Création d'un nouveau ViewModel dédié aux transactions (`TransactionsViewModel.cs`) :
+
+```csharp
+public partial class TransactionsViewModel : ViewModelBase
+{
+    private readonly ITransactionRepository _transactionRepository;
+    private readonly IAccountRepository _accountRepository;
+
+    // Données affichées
+    [ObservableProperty]
+    private ObservableCollection<Transaction> transactions = new();
+
+    [ObservableProperty]
+    private ObservableCollection<Account> accounts = new();
+
+    // Données du formulaire d'ajout
+    [ObservableProperty]
+    private DateTime newTransactionDate = DateTime.Now;
+
+    [ObservableProperty]
+    private decimal newTransactionAmount = 0;
+
+    [ObservableProperty]
+    private string newTransactionDescription = string.Empty;
+
+    [ObservableProperty]
+    private Account? selectedAccount = null;
+
+    [ObservableProperty]
+    private bool newTransactionIsDeferrable = false;
+
+    [ObservableProperty]
+    private bool isAddTransactionFormVisible = false;
+
+    // Constructeur avec injection de dépendances
+    public TransactionsViewModel(
+        ITransactionRepository transactionRepository,
+        IAccountRepository accountRepository)
+    {
+        _transactionRepository = transactionRepository;
+        _accountRepository = accountRepository;
+        LoadDataAsync();
+    }
+
+    // Commandes
+    [RelayCommand]
+    public void ShowAddTransactionForm() { ... }
+
+    [RelayCommand]
+    public void HideAddTransactionForm() { ... }
+
+    [RelayCommand]
+    public async Task AddTransactionAsync() { ... }
+
+    [RelayCommand]
+    public void CancelAddTransaction() { ... }
+}
+```
+
+**Commandes RelayCommand** :
+- `ShowAddTransactionFormCommand` : Affiche le formulaire + réinitialise les champs
+- `AddTransactionCommand` : Valide + ajoute à la base + ajoute à la collection observable
+- `CancelAddTransactionCommand` / `HideAddTransactionFormCommand` : Ferme le formulaire
+
+**Pourquoi un ViewModel séparé** :
+- La logique des transactions est **indépendante** du MainWindow
+- Permet de tester la logique d'ajout facilement
+- Future-proof : si on veut une fenêtre de dialogue, on réutilise le même ViewModel
+
+**Résultat** :
+- ✅ TransactionsViewModel créé avec 6 ObservableProperty et 4 RelayCommand
+
+---
+
+### ✅ Étape 3 : Ajouter le TransactionsViewModel à la DI
+
+**Ce qu'on a fait** :
+Modification de `App.axaml.cs` :
+
+```csharp
+// Enregistrer les ViewModels
+services.AddScoped<MainWindowViewModel>();
+services.AddScoped<TransactionsViewModel>();  // ← NEW
+```
+
+**Résultat** :
+- ✅ Le DI peut maintenant créer une instance de TransactionsViewModel
+
+---
+
+### ✅ Étape 4 : Créer le Formulaire d'Ajout en XAML
+
+**Ce qu'on a fait** :
+Ajout d'une Border avec formulaire dans `MainWindow.axaml` (onglet Transactions) :
+
+```xml
+<!-- Formulaire d'ajout (visible si IsAddTransactionFormVisible = true) -->
+<Border Background="#FEF5E7"
+        Padding="20"
+        CornerRadius="8"
+        BorderBrush="#F39C12"
+        BorderThickness="2"
+        IsVisible="{Binding IsAddTransactionFormVisible}">
+    <StackPanel Spacing="15">
+        <TextBlock Text="➕ Ajouter une Nouvelle Transaction"
+                  FontSize="18"
+                  FontWeight="SemiBold"/>
+
+        <!-- Grille de formulaire (4 lignes) -->
+        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" Spacing="15">
+            <!-- Date -->
+            <TextBlock Grid.Column="0" Grid.Row="0" Text="Date:"/>
+            <CalendarDatePicker Grid.Column="1" Grid.Row="0"
+                               SelectedDate="{Binding NewTransactionDate}"/>
+
+            <!-- Montant -->
+            <TextBlock Grid.Column="0" Grid.Row="1" Text="Montant (€):"/>
+            <TextBox Grid.Column="1" Grid.Row="1"
+                    Text="{Binding NewTransactionAmount}"
+                    Watermark="Ex: -45.50 ou 2500"/>
+
+            <!-- Description -->
+            <TextBlock Grid.Column="0" Grid.Row="2" Text="Description:"/>
+            <TextBox Grid.Column="1" Grid.Row="2"
+                    Text="{Binding NewTransactionDescription}"
+                    Watermark="Ex: Restaurant avec copains"/>
+
+            <!-- Compte -->
+            <TextBlock Grid.Column="0" Grid.Row="3" Text="Compte:"/>
+            <ComboBox Grid.Column="1" Grid.Row="3"
+                     ItemsSource="{Binding Accounts}"
+                     SelectedItem="{Binding SelectedAccount}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </Grid>
+
+        <!-- Checkbox Lissable -->
+        <CheckBox Content="Transaction Lissable (à étaler sur plusieurs mois)"
+                 IsChecked="{Binding NewTransactionIsDeferrable}"/>
+
+        <!-- Boutons -->
+        <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+            <Button Content="✅ Ajouter"
+                   Padding="15,10"
+                   Background="#27AE60"
+                   Foreground="White"
+                   Command="{Binding AddTransactionCommand}"/>
+            <Button Content="❌ Annuler"
+                   Padding="15,10"
+                   Background="#E74C3C"
+                   Foreground="White"
+                   Command="{Binding CancelAddTransactionCommand}"/>
+        </StackPanel>
+    </StackPanel>
+</Border>
+```
+
+**Éléments du formulaire** :
+- `CalendarDatePicker` : Sélecteur de date avec calendrier
+- `TextBox` : Champs texte avec watermark (texte gris placeholder)
+- `ComboBox` : Dropdown pour sélectionner un compte (avec DataTemplate pour afficher le nom)
+- `CheckBox` : Checkbox pour marquer comme "Lissable"
+- `IsVisible` binding : Le formulaire n'apparaît que si `IsAddTransactionFormVisible = true`
+
+**Résultat** :
+- ✅ Formulaire complet d'ajout visible sur demande
+
+---
+
+### ✅ Étape 5 : Connecter le Bouton "Nouvelle Transaction"
+
+**Ce qu'on a fait** :
+Modification du bouton dans `MainWindow.axaml` :
+
+```xml
+<Button Grid.Column="1"
+        Content="➕ Nouvelle Transaction"
+        Padding="15,10"
+        Command="{Binding ShowAddTransactionFormCommand}"/>
+```
+
+**Résultat** :
+- ✅ Le bouton exécute la commande `ShowAddTransactionFormCommand`
+- ✅ Le formulaire apparaît
+
+---
+
+### ✅ Étape 6 : Configurer le DataContext du TransactionsViewModel
+
+**Ce qu'on a fait** :
+Modification de `MainWindow.axaml.cs` pour assigner les ViewModels :
+
+```csharp
+public void SetupViewModels(MainWindowViewModel mainViewModel, TransactionsViewModel transactionsViewModel)
+{
+    // Le DataContext principal reste MainWindowViewModel
+    this.DataContext = mainViewModel;
+
+    // Assigner le TransactionsViewModel à l'onglet Transactions
+    var tabControl = this.FindControl<TabControl>("TabControl");
+    if (tabControl != null && tabControl.Items.Count >= 4)
+    {
+        var transactionsTab = (TabItem)tabControl.Items[3];
+        transactionsTab.DataContext = transactionsViewModel;
+    }
+}
+```
+
+Et dans `App.axaml.cs` :
+```csharp
+var mainWindowViewModel = _serviceProvider.GetRequiredService<MainWindowViewModel>();
+var transactionsViewModel = _serviceProvider.GetRequiredService<TransactionsViewModel>();
+
+var mainWindow = new MainWindow();
+mainWindow.SetupViewModels(mainWindowViewModel, transactionsViewModel);
+
+desktop.MainWindow = mainWindow;
+```
+
+**Pourquoi cette approche ?** :
+- Le header/footer du MainWindow utilise MainWindowViewModel
+- L'onglet Transactions utilise TransactionsViewModel
+- Les autres onglets utiliseront MainWindowViewModel pour l'instant
+
+**Résultat** :
+- ✅ Chaque partie de l'interface a le bon ViewModel
+
+---
+
+### ✅ Étape 7 : Logique d'Ajout de Transaction
+
+**Ce qu'on a fait** :
+Implémentation de `AddTransactionAsync()` dans TransactionsViewModel :
+
+```csharp
+[RelayCommand]
+public async Task AddTransactionAsync()
+{
+    // Validation
+    if (SelectedAccount == null || string.IsNullOrWhiteSpace(NewTransactionDescription) || NewTransactionAmount == 0)
+        return;
+
+    try
+    {
+        // Créer la nouvelle transaction
+        var newTransaction = new Transaction
+        {
+            AccountId = SelectedAccount.Id,
+            Date = NewTransactionDate,
+            Amount = NewTransactionAmount,
+            Description = NewTransactionDescription,
+            IsDeferrable = NewTransactionIsDeferrable
+        };
+
+        // Ajouter à la base de données
+        await _transactionRepository.AddAsync(newTransaction);
+
+        // Ajouter à la collection observable (mise à jour UI)
+        Transactions.Add(newTransaction);
+
+        // Mettre à jour le solde du compte
+        SelectedAccount.Balance += NewTransactionAmount;
+        await _accountRepository.UpdateAsync(SelectedAccount);
+
+        // Fermer le formulaire
+        HideAddTransactionForm();
+    }
+    catch (Exception ex)
+    {
+        System.Diagnostics.Debug.WriteLine($"Erreur: {ex.Message}");
+    }
+}
+```
+
+**Étapes** :
+1. Valide les champs (compte, description, montant)
+2. Crée l'objet `Transaction`
+3. L'ajoute à la base de données
+4. L'ajoute à la collection observable (UI mise à jour immédiatement)
+5. Met à jour le solde du compte
+6. Ferme le formulaire
+
+**Résultat** :
+- ✅ Quand on clique "Ajouter", la transaction est enregistrée et apparaît dans la liste
+
+---
+
+### ✅ Étape 8 : Git - Initialisation du dépôt local et Push sur GitHub
+
+**Ce qu'on a fait** :
+
+1. **Initialiser Git** :
+```bash
+git init
+```
+
+2. **Créer .gitignore** (pour .NET) :
+```
+bin/
+obj/
+*.db
+*.db-shm
+*.db-wal
+.vs/
+.vscode/
+```
+
+3. **Ajouter tous les fichiers et créer le commit initial** :
+```bash
+git add .
+git commit -m "Initial commit: Setup Compta_perso project with MVVM architecture, repositories, and transaction management"
+```
+
+4. **Configurer l'utilisateur Git** :
+```bash
+git config user.name "gizmo38"
+git config user.email "gizmo38@gmail.com"
+```
+
+5. **Ajouter le remote GitHub** :
+```bash
+git remote add origin https://github.com/gizmo38/Compta_perso.git
+git branch -M main
+git push -u origin main
+```
+
+**Résultat** :
+- ✅ Dépôt Git créé localement
+- ✅ **42 fichiers** poussés sur GitHub
+- ✅ **5828 lignes** de code
+- ✅ Repository : https://github.com/gizmo38/Compta_perso
+
+---
+
+## 📊 Récapitulatif de la Session 5
+
+### Fichiers créés :
+```
+src/Compta_perso/
+├── ViewModels/
+│   └── TransactionsViewModel.cs       ✅ (200 lignes)
+├── Data/
+│   └── AddTestTransactions.cs         ✅ (Correction doublons)
+└── .gitignore                         ✅
+```
+
+### Fichiers modifiés :
+```
+src/Compta_perso/
+├── Views/MainWindow.axaml             ✅ (Ajout formulaire + ItemsControl)
+├── Views/MainWindow.axaml.cs          ✅ (SetupViewModels())
+└── App.axaml.cs                       ✅ (Injection TransactionsViewModel)
+```
+
+### Architecture UI créée :
+
+```
+MainWindow (DataContext = MainWindowViewModel)
+├── Header
+│   └── Affiche TotalTresorerie + BudgetMois
+└── TabControl
+    └── Onglet "Transactions" (DataContext = TransactionsViewModel)
+        ├── Bouton "Nouvelle Transaction"
+        │   └── Appelle ShowAddTransactionFormCommand
+        ├── ItemsControl (liste des transactions)
+        │   └── DataTemplate affiche chaque transaction
+        └── Border (Formulaire d'ajout)
+            ├── CalendarDatePicker pour Date
+            ├── TextBox pour Montant, Description
+            ├── ComboBox pour sélectionner Compte
+            ├── CheckBox pour "Lissable"
+            └── Boutons ✅ Ajouter / ❌ Annuler
+                ├── Ajouter → AddTransactionCommand
+                └── Annuler → CancelAddTransactionCommand
+```
+
+### Concepts appris :
+- **ItemsControl** : Génère l'UI pour chaque élément d'une collection
+- **DataTemplate** : Définit comment afficher chaque élément
+- **RelayCommand** : Liaison entre boutons et méthodes du ViewModel
+- **Observable Collections** : Collections qui notifient l'UI des changements
+- **CalendarDatePicker** : Sélecteur de date avec calendrier
+- **ComboBox avec DataTemplate** : Dropdown personnalisé
+
+### Problèmes résolus :
+1. **Transactions en doublons** → Solution : Vérification `.Any()` avant ajout
+2. **XAML MultiBinding error** → Solution : Simplification en binding simple
+3. **SSH non configuré pour GitHub** → Solution : Utilisation HTTPS + GitHub CLI
+4. **Dépôt n'existe pas sur GitHub** → Solution : Le créer automatiquement via CLI
+
+### Architecture Final :
+
+```
+UI (XAML)
+    ↓
+ViewModels (MainWindowViewModel, TransactionsViewModel)
+    ↓
+Repositories (ITransactionRepository, IAccountRepository, IBudgetEntryRepository)
+    ↓
+Entity Framework Core (DbContext)
+    ↓
+SQLite Database (app.db)
+```
+
+---
+
+## 🎯 Prochaines Sessions
+
+### Phase 6 : Services Métier et Tests Unitaires
+- [ ] Implémenter `AmortizationService` (moteur de lissage)
+- [ ] Implémenter `BudgetCalculator` (calcul du "Reste à Vivre")
+- [ ] Tests unitaires pour chaque service
+
+### Phase 7 : Afficher les Vraies Données Partout
+- [ ] Binder les autres onglets (Tableau de Bord, Budget, Comptes)
+- [ ] Afficher les graphiques
+
+### Phase 8 : Import CSV
+- [ ] Créer `CsvTransactionImporter`
+- [ ] Interface pour uploader un fichier CSV
+
+---
+
+**Durée de la session** : ~120 minutes
+**Difficulté** : ⭐⭐⭐ Difficile (MVVM avancé, Git, formulaires)
+**Status** : ✅ Session 5 terminée avec succès
+**GitHub** : https://github.com/gizmo38/Compta_perso (main branch)
