@@ -1,0 +1,48 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Compta_perso.App"
+             xmlns:local="using:Compta_perso"
+             RequestedThemeVariant="Default">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+  
+    <Application.Styles>
+        <FluentTheme />
+
+        <!-- Styles personnalisés pour la couleur du texte -->
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="#2C3E50"/>
+        </Style>
+
+        <Style Selector="TabControl">
+            <Setter Property="Foreground" Value="#2C3E50"/>
+        </Style>
+
+        <!-- Styles pour les onglets (non sélectionné = gris, sélectionné = bleu foncé) -->
+        <Style Selector="TabItem">
+            <Setter Property="Foreground" Value="#7F8C8D"/>
+        </Style>
+
+        <!-- Onglet au passage de souris (non sélectionné) -->
+        <Style Selector="TabItem:pointerover:not(:selected)">
+            <Setter Property="Foreground" Value="#34495E"/>
+            <Setter Property="Background" Value="#ECF0F1"/>
+        </Style>
+
+        <!-- Onglet sélectionné -->
+        <Style Selector="TabItem:selected">
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="Background" Value="#3498DB"/>
+        </Style>
+
+        <!-- Onglet sélectionné au passage de souris (maintient le bleu) -->
+        <Style Selector="TabItem:selected:pointerover">
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="Background" Value="#2980B9"/>
+        </Style>
+
+    </Application.Styles>
+</Application>

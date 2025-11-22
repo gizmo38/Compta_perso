@@ -1,0 +1,364 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Compta_perso.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="700"
+        x:Class="Compta_perso.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Compta Perso - Gestion Budgétaire"
+        Width="1200" Height="700">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*" Background="#F5F5F5">
+
+        <!-- En-tête -->
+        <Border Grid.Row="0" Background="White" Padding="20,15" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="💰 Compta Perso" FontSize="24" FontWeight="Bold" Foreground="#2C3E50"/>
+                    <TextBlock Text="Gestion budgétaire intelligente" FontSize="12" Foreground="#7F8C8D"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="15">
+                    <TextBlock Text="Solde Trésorerie:" Foreground="#34495E" VerticalAlignment="Center"/>
+                    <TextBlock Text="2 450,00 €" FontSize="20" FontWeight="Bold" Foreground="#27AE60" VerticalAlignment="Center"/>
+                    <Border Width="1" Background="#D0D0D0" Margin="10,0"/>
+                    <TextBlock Text="Budget Mois:" Foreground="#34495E" VerticalAlignment="Center"/>
+                    <TextBlock Text="-1 250,00 €" FontSize="20" FontWeight="Bold" Foreground="#E74C3C" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Navigation par onglets -->
+        <TabControl Grid.Row="1" Padding="10" Background="#F5F5F5" Foreground="#2C3E50" x:Name="TabControl">
+
+            <!-- Onglet 1 : Tableau de Bord -->
+            <TabItem Header="📊 Tableau de Bord">
+                <ScrollViewer>
+                    <StackPanel Spacing="20" Margin="20">
+                        <TextBlock Text="Tableau de Bord" FontSize="28" FontWeight="Bold" Foreground="#2C3E50"/>
+
+                        <!-- Indicateurs clés -->
+                        <Border Background="#ECF0F1" Padding="20" CornerRadius="8">
+                            <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto">
+                                <StackPanel Grid.Column="0" Spacing="5">
+                                    <TextBlock Text="💵 Trésorerie Totale" FontSize="14" Foreground="#7F8C8D"/>
+                                    <TextBlock Text="2 450,00 €" FontSize="24" FontWeight="Bold" Foreground="#2ECC71"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Spacing="5">
+                                    <TextBlock Text="📅 Budget Mois en Cours" FontSize="14" Foreground="#7F8C8D"/>
+                                    <TextBlock Text="-1 250,00 €" FontSize="24" FontWeight="Bold" Foreground="#E74C3C"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Spacing="5">
+                                    <TextBlock Text="🎯 Reste à Dépenser" FontSize="14" Foreground="#7F8C8D"/>
+                                    <TextBlock Text="1 200,00 €" FontSize="24" FontWeight="Bold" Foreground="#3498DB"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Graphique simulé -->
+                        <Border Background="#FFFFFF" Padding="20" CornerRadius="8" BorderBrush="#BDC3C7" BorderThickness="1">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="📈 Évolution Budget vs Trésorerie" FontSize="18" FontWeight="SemiBold" Foreground="#2C3E50"/>
+                                <TextBlock Text="[Zone graphique - À implémenter avec LiveCharts ou OxyPlot]"
+                                          Foreground="#95A5A6" FontStyle="Italic" Margin="0,40,0,40"/>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Onglet 2 : Trésorerie -->
+            <TabItem Header="🏦 Trésorerie">
+                <ScrollViewer>
+                    <StackPanel Spacing="20" Margin="20">
+                        <TextBlock Text="Trésorerie Réelle" FontSize="28" FontWeight="Bold" Foreground="#2C3E50"/>
+
+                        <!-- Liste des comptes -->
+                        <Border Background="#FFFFFF" Padding="20" CornerRadius="8" BorderBrush="#BDC3C7" BorderThickness="1">
+                            <StackPanel Spacing="15">
+                                <TextBlock Text="Mes Comptes Bancaires" FontSize="18" FontWeight="SemiBold" Foreground="#2C3E50"/>
+
+                                <!-- Compte 1 -->
+                                <Border Background="#ECF0F1" Padding="15" CornerRadius="5">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="💳 Compte Courant BNP" FontSize="16" FontWeight="SemiBold"/>
+                                            <TextBlock Text="Compte principal" FontSize="12" Foreground="#7F8C8D"/>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" Text="1 850,00 €" FontSize="20" FontWeight="Bold"
+                                                  Foreground="#2ECC71" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Compte 2 -->
+                                <Border Background="#ECF0F1" Padding="15" CornerRadius="5">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="💰 Livret A" FontSize="16" FontWeight="SemiBold"/>
+                                            <TextBlock Text="Épargne de précaution" FontSize="12" Foreground="#7F8C8D"/>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" Text="600,00 €" FontSize="20" FontWeight="Bold"
+                                                  Foreground="#2ECC71" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Bouton ajouter -->
+                                <Button Content="➕ Ajouter un Compte" HorizontalAlignment="Left" Padding="15,10"/>
+
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Onglet 3 : Budget -->
+            <TabItem Header="📅 Budget">
+                <ScrollViewer>
+                    <StackPanel Spacing="20" Margin="20">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Budget Mensuel" FontSize="28" FontWeight="Bold" Foreground="#2C3E50"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                                <Button Content="◀" Padding="10,5"/>
+                                <TextBlock Text="Novembre 2025" FontSize="18" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#2C3E50"/>
+                                <Button Content="▶" Padding="10,5"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Entrées budgétaires -->
+                        <Border Background="#FFFFFF" Padding="20" CornerRadius="8" BorderBrush="#BDC3C7" BorderThickness="1">
+                            <StackPanel Spacing="15">
+                                <TextBlock Text="Engagements du Mois" FontSize="18" FontWeight="SemiBold" Foreground="#2C3E50"/>
+
+                                <!-- Entrée budgétaire 1 -->
+                                <Border Background="#FEE" Padding="15" CornerRadius="5" BorderBrush="#E74C3C" BorderThickness="1">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                                        <TextBlock Grid.Column="0" Grid.Row="0" Text="📱" FontSize="20" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="1" Grid.Row="0">
+                                            <TextBlock Text="Abonnement Netflix" FontSize="16" FontWeight="SemiBold"/>
+                                            <TextBlock Text="Provision mensuelle" FontSize="12" Foreground="#7F8C8D"/>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Grid.Row="0" Text="-15,99 €" FontSize="18" FontWeight="Bold"
+                                                  Foreground="#E74C3C" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Entrée budgétaire 2 -->
+                                <Border Background="#FEE" Padding="15" CornerRadius="5" BorderBrush="#E74C3C" BorderThickness="1">
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <TextBlock Grid.Column="0" Text="💻" FontSize="20" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="Ordinateur (Lissé sur 12 mois)" FontSize="16" FontWeight="SemiBold"/>
+                                            <TextBlock Text="Amortissement 3/12" FontSize="12" Foreground="#7F8C8D"/>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="2" Text="-100,00 €" FontSize="18" FontWeight="Bold"
+                                                  Foreground="#E74C3C" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Total -->
+                                <Border Background="#2C3E50" Padding="15" CornerRadius="5">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Total Engagements" FontSize="16" FontWeight="Bold" Foreground="White"/>
+                                        <TextBlock Grid.Column="1" Text="-115,99 €" FontSize="20" FontWeight="Bold" Foreground="#E74C3C"/>
+                                    </Grid>
+                                </Border>
+
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Onglet 4 : Transactions -->
+            <TabItem Header="💳 Transactions">
+                <ScrollViewer>
+                    <StackPanel Spacing="20" Margin="20">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Historique des Transactions" FontSize="28" FontWeight="Bold" Foreground="#2C3E50"/>
+                            <Button Grid.Column="1"
+                                    Content="➕ Nouvelle Transaction"
+                                    Padding="15,10"
+                                    Command="{Binding ShowAddTransactionFormCommand}"/>
+                        </Grid>
+
+                        <!-- Liste des transactions -->
+                        <Border Background="#FFFFFF" Padding="20" CornerRadius="8" BorderBrush="#BDC3C7" BorderThickness="1">
+                            <ItemsControl ItemsSource="{Binding Transactions}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#ECF0F1" Padding="15" CornerRadius="5" Margin="0,0,0,10">
+                                            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                                <!-- Date -->
+                                                <TextBlock Grid.Column="0"
+                                                          Text="{Binding Date, StringFormat='dd/MM/yyyy'}"
+                                                          FontSize="14"
+                                                          Foreground="#7F8C8D"
+                                                          VerticalAlignment="Center"
+                                                          Margin="0,0,15,0"/>
+
+                                                <!-- Description et Compte -->
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock Text="{Binding Description}" FontSize="16"/>
+                                                    <TextBlock Text="{Binding Account.Name}" FontSize="12" Foreground="#7F8C8D"/>
+                                                </StackPanel>
+
+                                                <!-- Statut Lissable -->
+                                                <TextBlock Grid.Column="2"
+                                                          FontSize="12"
+                                                          VerticalAlignment="Center"
+                                                          Margin="0,0,15,0"
+                                                          Foreground="#7F8C8D"
+                                                          Text="{Binding IsDeferrable}"/>
+
+
+                                                <!-- Montant -->
+                                                <TextBlock Grid.Column="3"
+                                                          Text="{Binding Amount, StringFormat='N2'} €"
+                                                          FontSize="16"
+                                                          FontWeight="SemiBold"
+                                                          Foreground="#2ECC71"
+                                                          VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+
+                        <!-- Formulaire d'ajout de transaction (visible si IsAddTransactionFormVisible = true) -->
+                        <Border Background="#FEF5E7"
+                                Padding="20"
+                                CornerRadius="8"
+                                BorderBrush="#F39C12"
+                                BorderThickness="2"
+                                IsVisible="{Binding IsAddTransactionFormVisible}">
+                            <StackPanel Spacing="15">
+                                <TextBlock Text="➕ Ajouter une Nouvelle Transaction"
+                                          FontSize="18"
+                                          FontWeight="SemiBold"
+                                          Foreground="#2C3E50"/>
+
+                                <!-- Grille de formulaire -->
+                                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" Spacing="15">
+                                    <!-- Date -->
+                                    <TextBlock Grid.Column="0" Grid.Row="0" Text="Date:" Foreground="#34495E" VerticalAlignment="Center"/>
+                                    <CalendarDatePicker Grid.Column="1" Grid.Row="0"
+                                                       SelectedDate="{Binding NewTransactionDate}"/>
+
+                                    <!-- Montant -->
+                                    <TextBlock Grid.Column="0" Grid.Row="1" Text="Montant (€):" Foreground="#34495E" VerticalAlignment="Center"/>
+                                    <TextBox Grid.Column="1" Grid.Row="1"
+                                            Text="{Binding NewTransactionAmount}"
+                                            Watermark="Ex: -45.50 ou 2500"
+                                            Foreground="#2C3E50"/>
+
+                                    <!-- Description -->
+                                    <TextBlock Grid.Column="0" Grid.Row="2" Text="Description:" Foreground="#34495E" VerticalAlignment="Center"/>
+                                    <TextBox Grid.Column="1" Grid.Row="2"
+                                            Text="{Binding NewTransactionDescription}"
+                                            Watermark="Ex: Restaurant avec copains"
+                                            Foreground="#2C3E50"/>
+
+                                    <!-- Compte -->
+                                    <TextBlock Grid.Column="0" Grid.Row="3" Text="Compte:" Foreground="#34495E" VerticalAlignment="Center"/>
+                                    <ComboBox Grid.Column="1" Grid.Row="3"
+                                             ItemsSource="{Binding Accounts}"
+                                             SelectedItem="{Binding SelectedAccount}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </Grid>
+
+                                <!-- Checkbox Lissable -->
+                                <CheckBox Content="Transaction Lissable (à étaler sur plusieurs mois)"
+                                         IsChecked="{Binding NewTransactionIsDeferrable}"
+                                         Foreground="#34495E"/>
+
+                                <!-- Boutons -->
+                                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right">
+                                    <Button Content="✅ Ajouter"
+                                           Padding="15,10"
+                                           Background="#27AE60"
+                                           Foreground="White"
+                                           Command="{Binding AddTransactionCommand}"/>
+                                    <Button Content="❌ Annuler"
+                                           Padding="15,10"
+                                           Background="#E74C3C"
+                                           Foreground="White"
+                                           Command="{Binding CancelAddTransactionCommand}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Onglet 5 : Comptes -->
+            <TabItem Header="⚙️ Comptes">
+                <ScrollViewer>
+                    <StackPanel Spacing="20" Margin="20">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Gestion des Comptes" FontSize="28" FontWeight="Bold" Foreground="#2C3E50"/>
+                            <Button Grid.Column="1" Content="➕ Nouveau Compte" Padding="15,10"/>
+                        </Grid>
+
+                        <!-- Configuration des comptes -->
+                        <Border Background="#FFFFFF" Padding="20" CornerRadius="8" BorderBrush="#BDC3C7" BorderThickness="1">
+                            <StackPanel Spacing="20">
+
+                                <!-- Section Comptes Réels -->
+                                <StackPanel Spacing="10">
+                                    <TextBlock Text="💳 Comptes Bancaires Réels" FontSize="18" FontWeight="SemiBold" Foreground="#2C3E50"/>
+
+                                    <Border Background="#E8F8F5" Padding="15" CornerRadius="5" BorderBrush="#16A085" BorderThickness="1">
+                                        <Grid ColumnDefinitions="*,Auto,Auto">
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="Compte Courant BNP" FontSize="16" FontWeight="SemiBold"/>
+                                                <TextBlock Text="Type: Compte réel • Créé le 01/01/2025" FontSize="12" Foreground="#7F8C8D"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="1 850,00 €" FontSize="18" FontWeight="Bold" Foreground="#2ECC71" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                                            <Button Grid.Column="2" Content="✏️ Modifier" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- Section Provisions -->
+                                <StackPanel Spacing="10">
+                                    <TextBlock Text="🎯 Comptes de Provision" FontSize="18" FontWeight="SemiBold" Foreground="#2C3E50"/>
+
+                                    <Border Background="#FEF5E7" Padding="15" CornerRadius="5" BorderBrush="#F39C12" BorderThickness="1">
+                                        <Grid ColumnDefinitions="*,Auto,Auto">
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="Livret A Vacances" FontSize="16" FontWeight="SemiBold"/>
+                                                <TextBlock Text="Type: Provision • ⚠️ Argent considéré comme 'dépensé' côté budget" FontSize="12" Foreground="#7F8C8D"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="600,00 €" FontSize="18" FontWeight="Bold" Foreground="#F39C12" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                                            <Button Grid.Column="2" Content="✏️ Modifier" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+        </TabControl>
+
+    </Grid>
+
+</Window>

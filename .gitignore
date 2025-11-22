@@ -1,0 +1,89 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio cache/options
+.vs/
+.vscode/
+
+# Rider
+.idea/
+*.sln.iml
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Local History for Visual Studio
+.localhistory/
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# Entity Framework & Database
+*.db
+*.db-shm
+*.db-wal
+app.db
+
+# NuGet
+.nuget/
+*.nupkg
+*.snupkg
+packages/
+.nuget/packages/
+
+# Publish Web Output
+publish/
+PublishProfiles/
+*.azurePubxml
+*.pubxml
+*.publishproj
+
+# Test Results
+TestResults/
+*.trx
+*.coverage
+
+# Local environment
+.env
+.env.local
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Misc
+*.log
+*.class
+*.jar
+*.zip
+*.7z
+
+# IDEs
+*.swp
+*.swo
+*~
